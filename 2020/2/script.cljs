@@ -33,6 +33,19 @@
         letter-frequency (get frequencies letter)]
     (and (>= letter-frequency min) (<= letter-frequency max))))
 
+(defn- validate-password-position
+  [condition-password]
+  (let [password (:password condition-password)
+        min (get-in condition-password [:condition :min])
+        max (get-in condition-password [:condition :max])
+        letter (get-in condition-password [:condition :letter])
+        letter-at-min-match (= letter (nth password (- min 1)))
+        letter-at-max-match (= letter (nth password (- max 1)))]
+    (and (or letter-at-min-match letter-at-max-match) (not (and letter-at-min-match letter-at-max-match)))))
+
 (def frequency-validity (map #(validate-password-frequency (parse-line %)) input))
 
+(def position-validity (map #(validate-password-position (parse-line %)) input))
+
 (count (filter #(identity %) frequency-validity))
+(count (filter #(identity %) position-validity))
